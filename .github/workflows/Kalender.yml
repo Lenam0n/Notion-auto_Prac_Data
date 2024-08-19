@@ -1,4 +1,4 @@
-name: Run Python Script
+name: Run Kalender
 
 # Definiert, wann der Workflow ausgelöst wird (jede Stunde)
 on:
@@ -15,9 +15,6 @@ jobs:
     env:
       NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
       DATABASE_KALENDER: ${{ secrets.DATABASE_KALENDER }}
-      DATABASE_TRIALS_ID: ${{ secrets.DATABASE_TRIALS_ID }}
-      DATABASE_MAPS_ID: ${{ secrets.DATABASE_MAPS_ID }}
-      DATABASE_PRAC_GEGNER_ID: ${{ secrets.DATABASE_PRAC_GEGNER_ID }}
 
     steps:
       - name: Checkout code
