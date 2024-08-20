@@ -20,6 +20,7 @@ jobs:
         GOOGLE_KALENDER_ID: ${{ secrets.GOOGLE_KALENDER_ID }}
         NOTION_PRAC_LIST: ${{ secrets.NOTION_PRAC_LIST }}
         NOTION_ENEMY_LIST: ${{ secrets.NOTION_ENEMY_LIST }}
+        GOOGLE_SERVICE_ACCOUNT_KEY: ${{secrets.GOOGLE_SERVICE_ACCOUNT_KEY}}
 
     steps:
       - name: Checkout code
