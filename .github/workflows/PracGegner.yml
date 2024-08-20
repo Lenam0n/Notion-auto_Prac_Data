@@ -13,10 +13,13 @@ jobs:
       name : app
 
     env:
-      NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
-      DATABASE_TRIALS_ID: ${{ secrets.DATABASE_TRIALS_ID }}
-      DATABASE_MAPS_ID: ${{ secrets.DATABASE_MAPS_ID }}
-      DATABASE_PRAC_GEGNER_ID: ${{ secrets.DATABASE_PRAC_GEGNER_ID }}
+        GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+        GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+        GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
+        NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+        GOOGLE_KALENDER_ID: ${{ secrets.GOOGLE_KALENDER_ID }}
+        NOTION_PRAC_LIST: ${{ secrets.NOTION_PRAC_LIST }}
+        NOTION_ENEMY_LIST: ${{ secrets.NOTION_ENEMY_LIST }}
 
     steps:
       - name: Checkout code
