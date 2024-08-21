@@ -3,7 +3,7 @@ name: Run Kalender
 # Definiert, wann der Workflow ausgelöst wird (jede Stunde)
 on:
   schedule:
-    - cron: "0 0 * * *"  # Jede volle Stunde
+    - cron: "0 * * * *"  # Jede volle Stunde
   workflow_dispatch:
 
 jobs:
