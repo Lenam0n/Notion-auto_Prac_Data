@@ -173,9 +173,7 @@ def google_auth():
     # Anmeldedaten aus dem Dictionary laden
     creds = Credentials.from_service_account_info(token_info,scopes=SCOPES)
 
-    # Prüfen, ob die Anmeldedaten gültig sind oder erneuert werden müssen
-    if not creds or not creds.valid:
-        raise ValueError("Credentials are invalid and cannot be refreshed. + ",creds)
+
 
 def main():
     #creds = None
