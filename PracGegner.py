@@ -165,7 +165,7 @@ def find_entry_id_by_name(name):
 
 def google_auth():
     if not GOOGLE_TOKEN:
-        raise ValueError("Google token not found in environment variables.")
+        raise ValueError("Google token not found in environment variables. +" + GOOGLE_TOKEN)
 
     # Token in ein Dictionary umwandeln
     token_info = json.loads(GOOGLE_TOKEN)
