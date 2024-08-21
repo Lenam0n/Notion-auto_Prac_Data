@@ -9,8 +9,9 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from notion_client import Client
 import re
+from dotenv import load_dotenv
 
-
+load_dotenv()
 calendar_id = os.getenv("GOOGLE_KALENDER_ID")
 NOTION_PRAC_LIST = os.getenv("NOTION_PRAC_LIST")
 NOTION_ENEMY_LIST = os.getenv("NOTION_ENEMY_LIST")
@@ -161,10 +162,6 @@ def find_entry_id_by_name(name):
     else:
         return None
 
-
-
-
-    
 
 def main():
     creds = None
