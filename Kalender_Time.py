@@ -84,9 +84,8 @@ def update_pages(pages):
                 }
             }
         )
+def Main():
+    update_pages(page_exists())
 
-
-# Überprüfen, ob die Seite bereits existiert
-if not page_exists(target_date_str):
-    # Wenn nicht, erstelle eine neue Seite
-    create_page_in_database(target_date_str, day_name)
+if __name__ == '__main__':
+    main()
