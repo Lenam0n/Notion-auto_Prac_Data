@@ -170,6 +170,7 @@ def main():
     if GOOGLE_TOKEN:
         #creds = Credentials.from_authorized_user_info(GOOGLE_TOKEN, SCOPES)
         creds = Credentials.from_service_account_info(json.loads(GOOGLE_TOKEN), scopes=SCOPES)
+        print(creds)
     # Neue Authentifizierung, falls nötig
     #if not creds or not creds.valid:
        # if creds and creds.expired and creds.refresh_token:
