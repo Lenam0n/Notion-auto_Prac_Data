@@ -13,14 +13,12 @@ jobs:
       name : app
 
     env:
-        GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-        GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-        GOOGLE_REFRESH_TOKEN: ${{ secrets.GOOGLE_REFRESH_TOKEN }}
         NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
         GOOGLE_KALENDER_ID: ${{ secrets.GOOGLE_KALENDER_ID }}
         NOTION_PRAC_LIST: ${{ secrets.NOTION_PRAC_LIST }}
         NOTION_ENEMY_LIST: ${{ secrets.NOTION_ENEMY_LIST }}
         GOOGLE_SERVICE_ACCOUNT_KEY: ${{secrets.GOOGLE_SERVICE_ACCOUNT_KEY}}
+        GOOGLE_TOKEN: ${{secrets.GOOGLE_TOKEN}}
 
     steps:
       - name: Checkout code
