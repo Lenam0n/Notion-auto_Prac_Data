@@ -1,0 +1,35 @@
+name: Run Kalender
+
+# Definiert, wann der Workflow ausgelöst wird (jede Stunde)
+on:
+  schedule:
+    - cron: "0 0 * * *"  # Einmal am tag
+  workflow_dispatch:
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    environment: 
+      name : app
+
+    env:
+      NOTION_API_KEY: ${{ secrets.NOTION_API_KEY }}
+      DATABASE_KALENDER: ${{ secrets.DATABASE_KALENDER }}
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v3
+        with:
+          python-version: 3.12
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install notion-client pytz
+          
+      - name: Run script
+        run: |
+          python ./Kalender.py
