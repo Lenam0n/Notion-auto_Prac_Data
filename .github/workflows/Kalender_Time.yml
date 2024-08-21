@@ -1,4 +1,4 @@
-name: Run Kalender
+name: Run Kalender_Time
 
 # Definiert, wann der Workflow ausgelöst wird (jede Stunde)
 on:
