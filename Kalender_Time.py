@@ -1,32 +1,24 @@
-import os
-from notion_client import Client
-from datetime import datetime, timedelta
+from datetime import datetime
 import pytz
+from notion_client import Client
 
-# Definiere die Stunde und die Zeitzone
-hour = 18
-timezone = pytz.timezone('Europe/Berlin')  # CEST ist die Sommerzeit für Berlin
+# Initialisiere den Notion-Client
+notion = Client(auth="YOUR_NOTION_API_KEY")
 
-# Erstelle ein datetime-Objekt für die angegebene Stunde heute
-now = datetime.now()
-local_time = datetime(year=now.year, month=now.month, day=now.day, hour=hour, minute=0, second=0, tzinfo=timezone)
+DATABASE_ID = "YOUR_DATABASE_ID"
 
-# Formatiere die Zeit als String
-formatted_time = local_time.strftime('%H:%M %Z')
+def time_render(num):
+    hour = num
+    timezone = pytz.timezone('Europe/Berlin')  # CEST ist die Sommerzeit für Berlin
+    now = datetime.now()
+    local_time = datetime(year=now.year, month=now.month, day=now.day, hour=hour, minute=0, second=0, tzinfo=timezone)
+    return local_time.isoformat()  # ISO 8601 Format für Notion
 
-print(f"{formatted_time} CEST")
-
-# Laden der Datenbank-ID aus der Umgebungsvariable
-DATABASE_ID = os.getenv("DATABASE_KALENDER")
-
-# Erstellen des Notion-Clients
-notion = Client(auth=os.getenv("NOTION_API_KEY"))
-def page_exists():
+def get_filtered_pages():
     query = notion.databases.query(
         database_id=DATABASE_ID,
         filter={
             "and": [
-                # Filter für Start und End Properties, die nicht leer sein dürfen
                 {
                     "property": "Start",
                     "number": {
@@ -39,17 +31,10 @@ def page_exists():
                         "is_not_empty": True
                     }
                 },
-                # Filter für Date Property, das irgendein Datum haben muss, aber keine Zeit und kein Enddatum
                 {
                     "property": "Date",
                     "date": {
                         "is_not_empty": True
-                    }
-                },
-                {
-                    "property": "Date",
-                    "date": {
-                        "does_not_contain": "T"  # Annahme: "T" in der ISO-Zeit bedeutet, dass Zeit enthalten ist
                     }
                 }
             ]
@@ -57,11 +42,6 @@ def page_exists():
     )
     pages = query.get('results', [])
     return pages
-
-def time_render(num):
-  now = datetime.now()
-  local_time = datetime(year=now.year, month=now.month, day=now.day, hour=num, minute=0, second=0, tzinfo=pytz.timezone('Europe/Berlin'))
-  return local_time
 
 def update_pages(pages):
     for page in pages:
@@ -84,8 +64,7 @@ def update_pages(pages):
                 }
             }
         )
-def main():
-    update_pages(page_exists())
 
-if __name__ == '__main__':
-    main()
+# Beispielnutzung
+filtered_pages = get_filtered_pages()
+update_pages(filtered_pages)
