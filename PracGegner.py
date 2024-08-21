@@ -9,6 +9,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from notion_client import Client
 import re
+import webbrowser
 
 
 calendar_id = os.getenv("GOOGLE_KALENDER_ID")
@@ -177,8 +178,9 @@ def main():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
+            webbrowser.register('chrome', None, webbrowser.GenericBrowser('/usr/bin/google-chrome'))
             flow = InstalledAppFlow.from_client_config(json.loads(GOOGLE_SERVICE_ACCOUNT_KEY), SCOPES)
-            creds = flow.run_local_server(port=0)
+            creds = flow.run_local_server(port=0, browser='chrome')
 
     # Google Calendar API-Dienst erstellen
     service = build('calendar', 'v3', credentials=creds)
