@@ -180,9 +180,6 @@ def google_auth():
         else:
             raise ValueError("Credentials are invalid and cannot be refreshed.")
 
-    # Google Calendar API-Dienst erstellen
-    service = build('calendar', 'v3', credentials=creds)
-
 def main():
     #creds = None
     # Token laden, falls vorhanden
