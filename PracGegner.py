@@ -172,6 +172,7 @@ def google_auth():
 
     # Anmeldedaten aus dem Dictionary laden
     creds = Credentials.from_service_account_info(token_info,scopes=SCOPES)
+    return creds
 
 
 
@@ -193,7 +194,8 @@ def main():
         #    code = input("Enter the authorization code: ")
         #    creds = flow.fetch_token(code=code)
 
-    google_auth()
+    creds = google_auth()
+    
     
     # Google Calendar API-Dienst erstellen
     service = build('calendar', 'v3', credentials=creds)
