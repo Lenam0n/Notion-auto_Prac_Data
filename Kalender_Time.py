@@ -2,7 +2,6 @@ from datetime import datetime
 import pytz
 from notion_client import Client
 import os
-from loadenv import dotenv
 from dotenv import load_dotenv
 
 load_dotenv()
