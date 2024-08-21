@@ -175,10 +175,7 @@ def google_auth():
 
     # Prüfen, ob die Anmeldedaten gültig sind oder erneuert werden müssen
     if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            raise ValueError("Credentials are invalid and cannot be refreshed.")
+        raise ValueError("Credentials are invalid and cannot be refreshed.")
 
 def main():
     #creds = None
