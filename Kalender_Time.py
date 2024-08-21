@@ -2,9 +2,7 @@ from datetime import datetime
 import pytz
 from notion_client import Client
 import os
-from dotenv import load_dotenv
 
-load_dotenv()
 # Initialisiere den Notion-Client
 notion = Client(auth=os.getenv("NOTION_API_KEY"))
 DATABASE_ID = os.getenv("DATABASE_KALENDER")
