@@ -170,13 +170,14 @@ def main():
     creds = None
     # Token laden, falls vorhanden
     if GOOGLE_TOKEN:
-        creds = Credentials.from_authorized_user_file(GOOGLE_TOKEN, SCOPES)
+        #creds = Credentials.from_authorized_user_file(GOOGLE_TOKEN, SCOPES)
+        creds = Credentials.from_authorized_user_info(GOOGLE_TOKEN, SCOPES)
     # Neue Authentifizierung, falls nötig
     if not creds or not creds.valid:
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_secrets_file(GOOGLE_SERVICE_ACCOUNT_KEY, SCOPES)
+            flow = InstalledAppFlow.from_client_config(GOOGLE_SERVICE_ACCOUNT_KEY, SCOPES)
             creds = flow.run_local_server(port=0)
 
     # Google Calendar API-Dienst erstellen
