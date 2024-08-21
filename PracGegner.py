@@ -171,7 +171,7 @@ def google_auth():
     token_info = json.loads(GOOGLE_TOKEN)
 
     # Anmeldedaten aus dem Dictionary laden
-    creds = Credentials.from_service_account_info(token_info, SCOPES)
+    creds = Credentials.from_service_account_info(token_info)
 
     # Prüfen, ob die Anmeldedaten gültig sind oder erneuert werden müssen
     if not creds or not creds.valid:
