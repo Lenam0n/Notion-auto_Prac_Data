@@ -1,11 +1,15 @@
 from datetime import datetime
 import pytz
 from notion_client import Client
+import os
+from loadenv import dotenv
+from dotenv import load_dotenv
+
 
 # Initialisiere den Notion-Client
-notion = Client(auth="YOUR_NOTION_API_KEY")
+notion = Client(auth=os.getenv("NOTION_API_KEY"))
 
-DATABASE_ID = "YOUR_DATABASE_ID"
+DATABASE_ID = os.getenv("DATABASE_KALENDER")
 
 def time_render(num):
     hour = num
