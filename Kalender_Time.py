@@ -84,7 +84,7 @@ def update_pages(pages):
                 }
             }
         )
-def Main():
+def main():
     update_pages(page_exists())
 
 if __name__ == '__main__':
