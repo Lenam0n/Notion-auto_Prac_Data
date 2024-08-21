@@ -177,7 +177,7 @@ def main():
         if creds and creds.expired and creds.refresh_token:
             creds.refresh(Request())
         else:
-            flow = InstalledAppFlow.from_client_config(GOOGLE_SERVICE_ACCOUNT_KEY, SCOPES)
+            flow = InstalledAppFlow.from_client_config(json.loads(GOOGLE_SERVICE_ACCOUNT_KEY), SCOPES)
             creds = flow.run_local_server(port=0)
 
     # Google Calendar API-Dienst erstellen
