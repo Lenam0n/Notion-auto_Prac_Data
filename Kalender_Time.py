@@ -2,9 +2,6 @@ from datetime import datetime
 import pytz
 from notion_client import Client
 import os
-from dotenv import load_dotenv
-
-load_dotenv()
 
 NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 # Initialisiere den Notion-Client
