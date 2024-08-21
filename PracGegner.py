@@ -13,7 +13,7 @@ import re
 from dotenv import load_dotenv
 
 load_dotenv()
-calendar_id = os.getenv("GOOGLE_KALENDER_ID")
+GOOGLE_KALENDER_ID = os.getenv("GOOGLE_KALENDER_ID")
 NOTION_PRAC_LIST = os.getenv("NOTION_PRAC_LIST")
 NOTION_ENEMY_LIST = os.getenv("NOTION_ENEMY_LIST")
 NOTION_API_KEY = os.getenv("NOTION_API_KEY")
@@ -191,7 +191,7 @@ def main():
     time_max = now.isoformat() + 'Z'
     
     # Abrufen der letzten 10 Ereignisse aus der Vergangenheit
-    events_result = service.events().list(calendarId=calendar_id, timeMin=time_min,
+    events_result = service.events().list(calendarId=GOOGLE_KALENDER_ID, timeMin=time_min,
                                           timeMax=time_max, maxResults=10, 
                                           singleEvents=True, orderBy='startTime').execute()
     events = events_result.get('items', [])
