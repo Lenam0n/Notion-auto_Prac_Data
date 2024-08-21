@@ -163,13 +163,32 @@ def find_entry_id_by_name(name):
     else:
         return None
 
+def google_auth():
+    if not GOOGLE_TOKEN:
+        raise ValueError("Google token not found in environment variables.")
+
+    # Token in ein Dictionary umwandeln
+    token_info = json.loads(GOOGLE_TOKEN)
+
+    # Anmeldedaten aus dem Dictionary laden
+    creds = Credentials.from_authorized_user_info(token_info, SCOPES)
+
+    # Prüfen, ob die Anmeldedaten gültig sind oder erneuert werden müssen
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            raise ValueError("Credentials are invalid and cannot be refreshed.")
+
+    # Google Calendar API-Dienst erstellen
+    service = build('calendar', 'v3', credentials=creds)
 
 def main():
-    creds = None
+    #creds = None
     # Token laden, falls vorhanden
-    if GOOGLE_TOKEN:
+    #if GOOGLE_TOKEN:
         #creds = Credentials.from_authorized_user_info(GOOGLE_TOKEN, SCOPES)
-        creds = Credentials.from_service_account_info(json.loads(GOOGLE_SERVICE_ACCOUNT_KEY), scopes=SCOPES)
+        #creds = Credentials.from_service_account_info(json.loads(GOOGLE_SERVICE_ACCOUNT_KEY), scopes=SCOPES)
         
     # Neue Authentifizierung, falls nötig
     #if not creds or not creds.valid:
@@ -182,6 +201,8 @@ def main():
         #    code = input("Enter the authorization code: ")
         #    creds = flow.fetch_token(code=code)
 
+    google_auth()
+    
     # Google Calendar API-Dienst erstellen
     service = build('calendar', 'v3', credentials=creds)
 
