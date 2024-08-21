@@ -1,45 +1,48 @@
 from __future__ import print_function
 import datetime
+import os.path
 import os
 import json
-from google.oauth2 import service_account
+from google.auth.transport.requests import Request
+from google.oauth2.credentials import Credentials
+from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
-from dotenv import load_dotenv
 from notion_client import Client
 import re
 
-# .env Datei laden
-load_dotenv()
+
 calendar_id = os.getenv("GOOGLE_KALENDER_ID")
 NOTION_PRAC_LIST = os.getenv("NOTION_PRAC_LIST")
 NOTION_ENEMY_LIST = os.getenv("NOTION_ENEMY_LIST")
 NOTION_API_KEY = os.getenv("NOTION_API_KEY")
-GOOGLE_SERVICE_ACCOUNT_KEY = os.getenv("GOOGLE_SERVICE_ACCOUNT_KEY")
+GOOGLE_TOKEN=os.getenv("GOOGLE_TOKEN")
+GOOGLE_SERVICE_ACCOUNT_KEY= os.getenv("GOOGLE_SERVICE_ACCOUNT_KEY")
 
 # Scopes definieren (Rechte für den Zugriff)
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
 notion = Client(auth=NOTION_API_KEY)
 
-def get_google_credentials():
-    # Google Service-Konto-Authentifizierung
-    credentials = service_account.Credentials.from_service_account_info(
-        json.loads(GOOGLE_SERVICE_ACCOUNT_KEY), scopes=SCOPES)
-    return credentials
 
 def extract_event_data(event):
+    # Datum extrahieren
     start = event['start'].get('dateTime', event['start'].get('date'))
+
+    # Name des Eintrags und Map-Informationen extrahieren
     summary = event.get('summary', '')
 
+    # Regex zum Extrahieren der gewünschten Teile
     pattern = r'^vs\. (.+?) \(Map: (.+?)\)$'
     match = re.match(pattern, summary)
 
     if match:
-        name = match.group(1).strip()
-        map_info = match.group(2).strip()
+        name = match.group(1).strip()  # Der Teil vor "(Map: "
+        map_info = match.group(2).strip()  # Der Teil nach "(Map: "
     else:
+        # Falls die Regex nicht passt, setze den Namen als gesamten Summary-Text
         name = summary.strip()
         map_info = None
 
+    # Daten in ein JSON-kompatibles Format bringen
     event_data = {
         'Datum': start,
         'Name': name,
@@ -48,6 +51,7 @@ def extract_event_data(event):
 
     return event_data
 
+    
 def page_exist_in_enemy_list(name):
     query = notion.databases.query(
         **{
@@ -61,6 +65,7 @@ def page_exist_in_enemy_list(name):
         }
     )
     return len(query['results']) > 0
+
 
 def create_page_in_enemy_list(name, date):
     new_page = {
@@ -151,18 +156,40 @@ def find_entry_id_by_name(name):
 
     results = query.get('results', [])
     if results:
+        # Assuming the first match is the correct one
         return results[0]['id']
     else:
         return None
 
+
+
+
+    
+
 def main():
-    creds = get_google_credentials()
+    creds = None
+    # Token laden, falls vorhanden
+    if GOOGLE_TOKEN:
+        creds = Credentials.from_authorized_user_file(GOOGLE_TOKEN, SCOPES)
+    # Neue Authentifizierung, falls nötig
+    if not creds or not creds.valid:
+        if creds and creds.expired and creds.refresh_token:
+            creds.refresh(Request())
+        else:
+            flow = InstalledAppFlow.from_client_secrets_file(GOOGLE_SERVICE_ACCOUNT_KEY, SCOPES)
+            creds = flow.run_local_server(port=0)
+
+    # Google Calendar API-Dienst erstellen
     service = build('calendar', 'v3', credentials=creds)
 
+    # Aktuelle Zeit (in UTC)
     now = datetime.datetime.utcnow()
+
+    # Startzeitpunkt auf 7 Tage zurücksetzen (oder nach Wunsch anpassen)
     time_min = (now - datetime.timedelta(days=21)).isoformat() + 'Z'
     time_max = now.isoformat() + 'Z'
-
+    
+    # Abrufen der letzten 10 Ereignisse aus der Vergangenheit
     events_result = service.events().list(calendarId=calendar_id, timeMin=time_min,
                                           timeMax=time_max, maxResults=10, 
                                           singleEvents=True, orderBy='startTime').execute()
@@ -171,6 +198,7 @@ def main():
     if not events:
         print('No upcoming events found.')
     else:
+        # Alle Ereignisse durchgehen und Daten extrahieren
         extracted_data = []
         for event in events:
             event_data = extract_event_data(event)
@@ -179,13 +207,21 @@ def main():
             name = event_data.get('Name')
             map_name = event_data.get('Map')
             if not page_exist_in_enemy_list(name):
-                create_page_in_enemy_list(name, date)
-                create_page_in_prac_list(date, map_name, find_entry_id_by_name(name))
+                create_page_in_enemy_list(name,date)
+                create_page_in_prac_list(date, map_name,find_entry_id_by_name(name))
 
             if not page_exist_prac_list(date, map_name, find_entry_id_by_name(name)):
-                create_page_in_prac_list(date, map_name, find_entry_id_by_name(name))
-
-        print("successfully posted")
+            #    # Wenn nicht, erstelle eine neue Seite
+                create_page_in_prac_list(date, map_name,find_entry_id_by_name(name))
+        
+        # Ergebnisse als JSON formatieren
+        #json_output = json.dumps(extracted_data, indent=4)
+        #–––––––
+        #–––––––
+        #wie die ausgabe ist checken
+        
+        print("sucsessfully posted")
+        #print(json_output)
 
 if __name__ == '__main__':
     main()
