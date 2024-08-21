@@ -167,18 +167,18 @@ def main():
     creds = None
     # Token laden, falls vorhanden
     if GOOGLE_TOKEN:
-        #creds = Credentials.from_authorized_user_file(GOOGLE_TOKEN, SCOPES)
-        creds = Credentials.from_authorized_user_info(GOOGLE_TOKEN, SCOPES)
+        #creds = Credentials.from_authorized_user_info(GOOGLE_TOKEN, SCOPES)
+        creds = Credentials.from_service_account_info(json.loads(GOOGLE_TOKEN), scopes=SCOPES)
     # Neue Authentifizierung, falls nötig
-    if not creds or not creds.valid:
-        if creds and creds.expired and creds.refresh_token:
-            creds.refresh(Request())
-        else:
-            flow = InstalledAppFlow.from_client_config(json.loads(GOOGLE_SERVICE_ACCOUNT_KEY), SCOPES)
-            auth_url, _ = flow.authorization_url(prompt='consent')
-            print(f"Please go to this URL: {auth_url}")
-            code = input("Enter the authorization code: ")
-            creds = flow.fetch_token(code=code)
+    #if not creds or not creds.valid:
+       # if creds and creds.expired and creds.refresh_token:
+        #    creds.refresh(Request())
+       # else:
+        #    flow = InstalledAppFlow.from_client_config(json.loads(GOOGLE_SERVICE_ACCOUNT_KEY), SCOPES)
+        #    auth_url, _ = flow.authorization_url(prompt='consent')
+        #    print(f"Please go to this URL: {auth_url}")
+        #    code = input("Enter the authorization code: ")
+        #    creds = flow.fetch_token(code=code)
 
     # Google Calendar API-Dienst erstellen
     service = build('calendar', 'v3', credentials=creds)
