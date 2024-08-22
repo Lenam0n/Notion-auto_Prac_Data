@@ -76,11 +76,18 @@ def update_pages(pages):
         if start_hour > 24 or start_minute > 59 or end_hour > 24 or end_minute > 59:
             continue  # Überspringe diese Seite, da die Zeit ungültig ist
         
-        # Erstelle die Start- und Endzeiten in UTC nur wenn die Zeiten gültig sind
+        # Erstelle die Start- und Endzeiten in UTC
         start_time = time_render(start_hour, start_minute, existing_date_str)
         end_time = time_render(end_hour, end_minute, existing_date_str)
-        
-        # Aktualisiere die Date-Property
+
+        # Prüfe, ob die gespeicherten Zeiten gleich den neu berechneten Zeiten sind
+        existing_start_time = page['properties']['Date']['date']['start']
+        existing_end_time = page['properties']['Date']['date'].get('end')
+
+        if existing_start_time == start_time and existing_end_time == end_time:
+            continue  # Überspringe diese Seite, wenn keine Änderungen erforderlich sind
+
+        # Aktualisiere die Date-Property, wenn es Änderungen gibt
         notion.pages.update(
             page_id=page['id'],
             properties={
