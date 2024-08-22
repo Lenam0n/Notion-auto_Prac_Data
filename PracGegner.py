@@ -71,11 +71,9 @@ def page_exsist_in_analysis_page(name):
     query = notion.databases.query(
         database_id=NOTION_ANALYSIS_MAP,
         filter={
-                {
-                    "property": "Map",
-                    "title": {
-                        "equals": name
-                    }
+                "property": "Map",
+                "title": {
+                    "equals": name
                 }
         }
     )
