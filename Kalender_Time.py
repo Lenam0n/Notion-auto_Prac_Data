@@ -2,16 +2,19 @@ from datetime import datetime
 import pytz
 from notion_client import Client
 import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 # Initialisiere den Notion-Client
 notion = Client(auth=NOTION_API_KEY)
 DATABASE_ID = os.getenv("DATABASE_KALENDER")
 
-def time_render(hour, date_str):
+def time_render(hour, minute, date_str):
     # Erstelle ein datetime-Objekt basierend auf dem bestehenden Datum und der Uhrzeit
     timezone = pytz.timezone('Europe/Berlin')
-    local_time = timezone.localize(datetime.strptime(f"{date_str} {hour:02d}:00:00", "%Y-%m-%d %H:%M:%S"))
+    local_time = timezone.localize(datetime.strptime(f"{date_str} {hour:02d}:{minute:02d}:00", "%Y-%m-%d %H:%M:%S"))
     
     # Konvertiere die lokale Zeit nach UTC
     utc_time = local_time.astimezone(pytz.utc)
@@ -26,13 +29,13 @@ def get_filtered_pages():
             "and": [
                 {
                     "property": "Start",
-                    "number": {
+                    "rich_text": {
                         "is_not_empty": True
                     }
                 },
                 {
                     "property": "End",
-                    "number": {
+                    "rich_text": {
                         "is_not_empty": True
                     }
                 },
@@ -56,12 +59,21 @@ def update_pages(pages):
         existing_date = page['properties']['Date']['date']['start']
         existing_date_str = existing_date.split("T")[0]  # Nur das Datum im Format "YYYY-MM-DD"
 
-        start_number = page['properties']['Start']['number']
-        end_number = page['properties']['End']['number']
+        start_time_str = page['properties']['Start']['rich_text'][0]['text']['content']
+        end_time_str = page['properties']['End']['rich_text'][0]['text']['content']
         
+        # Stunden und Minuten extrahieren
+        start_hour, start_minute = map(int, start_time_str.split(":"))
+        end_hour, end_minute = map(int, end_time_str.split(":"))
+        
+        # Überprüfung der Zeitwerte
+        if start_hour > 24 or start_minute > 59 or end_hour > 24 or end_minute > 59:
+            print(f"Ungültige Zeit in Seite {page['id']}: {start_time_str} - {end_time_str}")
+            continue  # Überspringe diese Seite, da die Zeit ungültig ist
+
         # Erstelle die Start- und Endzeiten in UTC
-        start_time = time_render(int(start_number), existing_date_str)
-        end_time = time_render(int(end_number), existing_date_str)
+        start_time = time_render(start_hour, start_minute, existing_date_str)
+        end_time = time_render(end_hour, end_minute, existing_date_str)
         
         # Aktualisiere die Date-Property
         notion.pages.update(
@@ -76,6 +88,7 @@ def update_pages(pages):
                 }
             }
         )
+
 # Beispielnutzung
 filtered_pages = get_filtered_pages()
 update_pages(filtered_pages)
