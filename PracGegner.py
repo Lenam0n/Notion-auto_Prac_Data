@@ -180,8 +180,15 @@ def find_entry_id_by_name(name,db):
         }
     )
 
-    return query.get('results', [])
 
+    results = query.get('results', [])
+    
+    if results:
+        # Assuming the first match is the correct one
+        return results[0]['id']
+    else:
+        return None
+        
 def google_auth():
     if not GOOGLE_TOKEN:
         raise ValueError("Google token not found in environment variables. +" , GOOGLE_TOKEN)
@@ -285,11 +292,11 @@ def main():
             map_name = event_data.get('Map')
             if not page_exist_in_enemy_list(name):
                 create_page_in_enemy_list(name,date)
-                create_page_in_prac_list(date, map_name,find_entry_id_by_name(name,NOTION_ENEMY_LIST)[0]['id'])
+                create_page_in_prac_list(date, map_name,find_entry_id_by_name(name,NOTION_ENEMY_LIST))
 
-            if not page_exist_prac_list(date, map_name, find_entry_id_by_name(name,NOTION_ENEMY_LIST)[0]['id']):
+            if not page_exist_prac_list(date, map_name, find_entry_id_by_name(name,NOTION_ENEMY_LIST)):
             #    # Wenn nicht, erstelle eine neue Seite
-                create_page_in_prac_list(date, map_name,find_entry_id_by_name(name,NOTION_ENEMY_LIST)[0]['id'])
+                create_page_in_prac_list(date, map_name,find_entry_id_by_name(name,NOTION_ENEMY_LIST))
         
         # Ergebnisse als JSON formatieren
         #json_output = json.dumps(extracted_data, indent=4)
