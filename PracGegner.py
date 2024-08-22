@@ -227,7 +227,7 @@ def append_to_analysis(map_name, created_page):
     mapContainer = mapContainer_results[0]
 
     # Extrahiere die Relation-Property
-    existing_relations = mapContainer['properties']['Related Maps']['relation']
+    existing_relations = mapContainer['properties']['Maps']['relation']
     existing_relation_ids = [relation['id'] for relation in existing_relations]
 
     # Finden der ID der Map, die wir hinzufügen möchten
