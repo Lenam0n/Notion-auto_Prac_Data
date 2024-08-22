@@ -283,11 +283,11 @@ def main():
             map_name = event_data.get('Map')
             if not page_exist_in_enemy_list(name):
                 create_page_in_enemy_list(name,date)
-                create_page_in_prac_list(date, map_name,find_entry_id_by_name(name,NOTION_ENEMY_LIST)[0])
+                create_page_in_prac_list(date, map_name,find_entry_id_by_name(name,NOTION_ENEMY_LIST)[0]['id'])
 
-            if not page_exist_prac_list(date, map_name, find_entry_id_by_name(name,NOTION_ENEMY_LIST)[0]):
+            if not page_exist_prac_list(date, map_name, find_entry_id_by_name(name,NOTION_ENEMY_LIST)[0]['id']):
             #    # Wenn nicht, erstelle eine neue Seite
-                create_page_in_prac_list(date, map_name,find_entry_id_by_name(name,NOTION_ENEMY_LIST)[0])
+                create_page_in_prac_list(date, map_name,find_entry_id_by_name(name,NOTION_ENEMY_LIST)[0]['id'])
         
         # Ergebnisse als JSON formatieren
         #json_output = json.dumps(extracted_data, indent=4)
