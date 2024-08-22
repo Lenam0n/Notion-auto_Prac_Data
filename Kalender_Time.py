@@ -48,6 +48,15 @@ def get_filtered_pages():
     pages = query.get('results', [])
     return pages
 
+def parse_time_string(time_str):
+    """Parst die Zeit aus einem String. Gibt Stunden und Minuten zurück."""
+    if ":" in time_str:
+        hour, minute = map(int, time_str.split(":"))
+    else:
+        hour = int(time_str)
+        minute = 0
+    return hour, minute
+
 def update_pages(pages):
     timezone = 'Europe/Berlin'  # Zeitzone festlegen
 
@@ -59,16 +68,15 @@ def update_pages(pages):
         start_time_str = page['properties']['Start']['rich_text'][0]['text']['content']
         end_time_str = page['properties']['End']['rich_text'][0]['text']['content']
         
-        # Stunden und Minuten extrahieren
-        start_hour, start_minute = map(int, start_time_str.split(":"))
-        end_hour, end_minute = map(int, end_time_str.split(":"))
+        # Stunden und Minuten extrahieren mit der neuen Bedingung
+        start_hour, start_minute = parse_time_string(start_time_str)
+        end_hour, end_minute = parse_time_string(end_time_str)
         
         # Überprüfung der Zeitwerte
         if start_hour > 24 or start_minute > 59 or end_hour > 24 or end_minute > 59:
-            print(f"Ungültige Zeit in Seite {page['id']}: {start_time_str} - {end_time_str}")
             continue  # Überspringe diese Seite, da die Zeit ungültig ist
-
-        # Erstelle die Start- und Endzeiten in UTC
+        
+        # Erstelle die Start- und Endzeiten in UTC nur wenn die Zeiten gültig sind
         start_time = time_render(start_hour, start_minute, existing_date_str)
         end_time = time_render(end_hour, end_minute, existing_date_str)
         
