@@ -10,10 +10,13 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from notion_client import Client
 import re
+from dotenv import load_dotenv
 
+load_dotenv()
 GOOGLE_KALENDER_ID = os.getenv("GOOGLE_KALENDER_ID")
 NOTION_PRAC_LIST = os.getenv("NOTION_PRAC_LIST")
 NOTION_ENEMY_LIST = os.getenv("NOTION_ENEMY_LIST")
+NOTION_ANALYSIS_MAP=os.getenv("NOTION_ANALYSIS_MAP")
 NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 GOOGLE_TOKEN=os.getenv("GOOGLE_TOKEN")
 GOOGLE_SERVICE_ACCOUNT_KEY= os.getenv("GOOGLE_SERVICE_ACCOUNT_KEY")
@@ -66,6 +69,21 @@ def page_exist_in_enemy_list(name):
     )
     return len(query['results']) > 0
 
+def page_exsist_in_analysis_page(name):
+    query = notion.databases.query(
+        database_id=NOTION_ANALYSIS_MAP,
+        filter={
+                {
+                    "property": "Map",
+                    "title": {
+                        "equals": name
+                    }
+                }
+        }
+    )
+    pages = query.get('results', [])
+    return pages
+
 
 def create_page_in_enemy_list(name, date):
     new_page = {
@@ -115,7 +133,11 @@ def create_page_in_prac_list(date, map_name, gegner_id):
                 }
 }
     }
-    notion.pages.create(**new_page)
+    # Erstelle die neue Seite und speichere das Ergebnis
+    created_page = notion.pages.create(**new_page)
+
+    # Übergebe die erstellte Seite an die Funktion append_to_analysis
+    append_to_analysis(map_name, created_page)
 
 def page_exist_prac_list(date, map_name, related_task_id):
     query = notion.databases.query(
@@ -147,10 +169,10 @@ def page_exist_prac_list(date, map_name, related_task_id):
     )
     return len(query['results']) > 0
 
-def find_entry_id_by_name(name):
+def find_entry_id_by_name(name,db):
     query = notion.databases.query(
         **{
-            "database_id": NOTION_ENEMY_LIST,
+            "database_id": db,
             "filter": {
                 "property": "Name",
                 "title": {
@@ -160,12 +182,7 @@ def find_entry_id_by_name(name):
         }
     )
 
-    results = query.get('results', [])
-    if results:
-        # Assuming the first match is the correct one
-        return results[0]['id']
-    else:
-        return None
+    return query.get('results', [])
 
 def google_auth():
     if not GOOGLE_TOKEN:
@@ -206,11 +223,42 @@ def mapSelect(map_name):
     else:
         return ""
 
+def append_to_analysis(map_name, created_page):
+    # Suchen nach dem Map-Container in der Analysis Map
+    mapContainer_results = page_exsist_in_analysis_page(map_name)
 
+    if not mapContainer_results:
+        print(f"No analysis container found for map: {map_name}")
+        return
+
+    mapContainer = mapContainer_results[0]
+
+    # Extrahiere die Relation-Property
+    existing_relations = mapContainer['properties']['Related Maps']['relation']
+    existing_relation_ids = [relation['id'] for relation in existing_relations]
+
+    # Finden der ID der Map, die wir hinzufügen möchten
+    map_id = created_page['id']
+
+    # Überprüfen, ob diese Map-ID bereits in den Beziehungen enthalten ist
+    if map_id not in existing_relation_ids:
+        existing_relations.append({'id': map_id})
+
+        # Aktualisiere die Seite mit der neuen Relation
+        updated_page = {
+            "parent": {"database_id": NOTION_ANALYSIS_MAP},
+            "properties": {
+                "Related Maps": {
+                    "relation": existing_relations
+                }
+            }
+        }
+
+        notion.pages.update(page_id=mapContainer['id'], properties=updated_page)
+        
 def main():
     creds = google_auth()
-    
-    
+
     # Google Calendar API-Dienst erstellen
     service = build('calendar', 'v3', credentials=creds)
 
@@ -240,11 +288,11 @@ def main():
             map_name = event_data.get('Map')
             if not page_exist_in_enemy_list(name):
                 create_page_in_enemy_list(name,date)
-                create_page_in_prac_list(date, map_name,find_entry_id_by_name(name))
+                create_page_in_prac_list(date, map_name,find_entry_id_by_name(name,NOTION_ENEMY_LIST))
 
-            if not page_exist_prac_list(date, map_name, find_entry_id_by_name(name)):
+            if not page_exist_prac_list(date, map_name, find_entry_id_by_name(name,NOTION_ENEMY_LIST)):
             #    # Wenn nicht, erstelle eine neue Seite
-                create_page_in_prac_list(date, map_name,find_entry_id_by_name(name))
+                create_page_in_prac_list(date, map_name,find_entry_id_by_name(name,NOTION_ENEMY_LIST))
         
         # Ergebnisse als JSON formatieren
         #json_output = json.dumps(extracted_data, indent=4)
