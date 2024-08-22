@@ -69,11 +69,13 @@ def page_exist_in_enemy_list(name):
 
 def page_exsist_in_analysis_page(name):
     query = notion.databases.query(
-        "database_id" : NOTION_ANALYSIS_MAP,
-        "filter"={
-            "property": "Name",
-            "title": {
-                "equals": name
+        **{
+            "database_id" : NOTION_ANALYSIS_MAP,
+            "filter"={
+                "property": "Name",
+                "title": {
+                    "equals": name
+                }
             }
         }
     )
