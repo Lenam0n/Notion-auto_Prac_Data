@@ -224,7 +224,6 @@ def append_to_analysis(map_name, created_page):
     mapContainer_results = page_exsist_in_analysis_page(map_name)
 
     if not mapContainer_results:
-        print(f"No analysis container found for map: {map_name}")
         return
 
     mapContainer = mapContainer_results[0]
@@ -239,7 +238,8 @@ def append_to_analysis(map_name, created_page):
     # Überprüfen, ob diese Map-ID bereits in den Beziehungen enthalten ist
     if map_id not in existing_relation_ids:
         # Füge die neue Relation hinzu
-        updated_relations = existing_relations + [{'id': map_id}]
+        updated_relations = existing_relations
+        updated_relations.append({'id': map_id})
         
         # Aktualisiere die Seite mit den neuen Beziehungen
         notion.pages.update(
