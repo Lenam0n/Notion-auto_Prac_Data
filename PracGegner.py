@@ -71,14 +71,16 @@ def page_exsist_in_analysis_page(name):
     query = notion.databases.query(
         database_id=NOTION_ANALYSIS_MAP,
         filter={
-                "property": "Map",
-                "title": {
-                    "equals": name
-                }
+            "property": "Name",
+            "title": {
+                "equals": name
+            }
         }
     )
     pages = query.get('results', [])
-    return pages
+    
+    # Gibt nur das erste Ergebnis zurück, wenn vorhanden, ansonsten None
+    return pages[0] if pages else None
 
 
 def create_page_in_enemy_list(name, date):
@@ -221,10 +223,10 @@ def append_to_analysis(map_name, created_page):
     # Suchen nach dem Map-Container in der Analysis Map
     mapContainer_results = page_exsist_in_analysis_page(map_name)
 
-    if not mapContainer_results:
+    if not mapContainer_results or mapContainer_results == None:
         return
 
-    mapContainer = mapContainer_results[0]
+    mapContainer = mapContainer_results
 
     # Extrahiere die Relation-Property
     existing_relations = mapContainer['properties']['Maps']['relation']
@@ -243,7 +245,7 @@ def append_to_analysis(map_name, created_page):
         notion.pages.update(
             page_id=mapContainer['id'],
             properties={
-                "Related Maps": {
+                "Maps": {
                     "relation": updated_relations
                 }
             }
