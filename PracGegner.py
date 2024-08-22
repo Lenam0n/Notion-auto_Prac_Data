@@ -10,9 +10,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 from notion_client import Client
 import re
-from dotenv import load_dotenv
 
-load_dotenv()
 GOOGLE_KALENDER_ID = os.getenv("GOOGLE_KALENDER_ID")
 NOTION_PRAC_LIST = os.getenv("NOTION_PRAC_LIST")
 NOTION_ENEMY_LIST = os.getenv("NOTION_ENEMY_LIST")
@@ -141,30 +139,28 @@ def create_page_in_prac_list(date, map_name, gegner_id):
 
 def page_exist_prac_list(date, map_name, related_task_id):
     query = notion.databases.query(
-        **{
-            "database_id": NOTION_PRAC_LIST,
-            "filter": {
-                "and": [
-                    {
-                        "property": "Wann gegen gespielt",
-                        "date": {
-                            "equals": date
-                        }
-                    },
-                    {
-                        "property": "Map",
-                        "title": {
-                            "equals": map_name
-                        }
-                    },
-                    {
-                        "property": "Prac Gegner",
-                        "relation": {
-                            "contains": related_task_id
-                        }
+        database_id=NOTION_PRAC_LIST,
+        filter={
+            "and": [
+                {
+                    "property": "Wann gegen gespielt",
+                    "date": {
+                        "equals": date
                     }
-                ]
-            }
+                },
+                {
+                    "property": "Map",
+                    "title": {
+                        "equals": map_name
+                    }
+                },
+                {
+                    "property": "Prac Gegner",
+                    "relation": {
+                        "contains": related_task_id
+                    }
+                }
+            ]
         }
     )
     return len(query['results']) > 0
@@ -242,20 +238,19 @@ def append_to_analysis(map_name, created_page):
 
     # Überprüfen, ob diese Map-ID bereits in den Beziehungen enthalten ist
     if map_id not in existing_relation_ids:
-        existing_relations.append({'id': map_id})
-
-        # Aktualisiere die Seite mit der neuen Relation
-        updated_page = {
-            "parent": {"database_id": NOTION_ANALYSIS_MAP},
-            "properties": {
+        # Füge die neue Relation hinzu
+        updated_relations = existing_relations + [{'id': map_id}]
+        
+        # Aktualisiere die Seite mit den neuen Beziehungen
+        notion.pages.update(
+            page_id=mapContainer['id'],
+            properties={
                 "Related Maps": {
-                    "relation": existing_relations
+                    "relation": updated_relations
                 }
             }
-        }
+        )
 
-        notion.pages.update(page_id=mapContainer['id'], properties=updated_page)
-        
 def main():
     creds = google_auth()
 
