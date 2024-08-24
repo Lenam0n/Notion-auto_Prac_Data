@@ -194,7 +194,7 @@ def google_auth():
         raise ValueError("Google token not found in environment variables. +" , GOOGLE_TOKEN)
 
     # Token in ein Dictionary umwandeln
-    token_info = GOOGLE_TOKEN
+    token_info = json.loads(GOOGLE_TOKEN)
 
     # Anmeldedaten aus dem Dictionary laden
     creds = Credentials.from_service_account_info(token_info,scopes=SCOPES)
