@@ -270,11 +270,11 @@ def main():
     # Aktuelle Zeit (in UTC)
     now = datetime.utcnow()
 
-    print(now)
 
     # Startzeitpunkt auf 7 Tage zurücksetzen (oder nach Wunsch anpassen)
     time_min = (now - timedelta(days=21)).isoformat() + 'Z'
     time_max = (now + timedelta(hours=3)).isoformat() + 'Z'
+    print(time_max)
     
     # Abrufen der letzten 10 Ereignisse aus der Vergangenheit
     events_result = service.events().list(calendarId=GOOGLE_KALENDER_ID, timeMin=time_min,
