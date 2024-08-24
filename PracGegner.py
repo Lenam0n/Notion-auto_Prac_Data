@@ -268,7 +268,7 @@ def main():
     service = build('calendar', 'v3', credentials=creds)
 
     # Aktuelle Zeit (in UTC)
-    now = timezone.utc()
+    now = datetime.timezone.utc()
 
     # Startzeitpunkt auf 7 Tage zurücksetzen (oder nach Wunsch anpassen)
     time_min = (now - timedelta(days=21)).isoformat() + 'Z'
