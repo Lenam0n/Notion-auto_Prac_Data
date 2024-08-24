@@ -300,13 +300,13 @@ def main():
                 create_page_in_prac_list(date, map_name,find_entry_id_by_name(name,NOTION_ENEMY_LIST))
         
         # Ergebnisse als JSON formatieren
-        #json_output = json.dumps(extracted_data, indent=4)
+        json_output = json.dumps(extracted_data, indent=4)
         #–––––––
         #–––––––
         #wie die ausgabe ist checken
         
+        print(json_output)
         print("sucsessfully posted")
-        #print(json_output)
 
 if __name__ == '__main__':
     main()
