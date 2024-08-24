@@ -268,10 +268,10 @@ def main():
     service = build('calendar', 'v3', credentials=creds)
 
     # Aktuelle Zeit (in UTC)
-    now = datetime.datetime.utcnow()
+    now = datetime.utcnow()
 
     # Startzeitpunkt auf 7 Tage zurücksetzen (oder nach Wunsch anpassen)
-    time_min = (now - datetime.timedelta(days=21)).isoformat() + 'Z'
+    time_min = (now - timedelta(days=21)).isoformat() + 'Z'
     time_max = (now.isoformat() + timedelta(hours=2)) + 'Z'
     
     # Abrufen der letzten 10 Ereignisse aus der Vergangenheit
