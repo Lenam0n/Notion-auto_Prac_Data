@@ -18,7 +18,6 @@ NOTION_ENEMY_LIST = os.getenv("NOTION_ENEMY_LIST")
 NOTION_ANALYSIS_MAP=os.getenv("NOTION_ANALYSIS_MAP")
 NOTION_API_KEY = os.getenv("NOTION_API_KEY")
 GOOGLE_TOKEN=os.getenv("GOOGLE_TOKEN")
-GOOGLE_SERVICE_ACCOUNT_KEY= os.getenv("GOOGLE_SERVICE_ACCOUNT_KEY")
 
 # Scopes definieren (Rechte für den Zugriff)
 SCOPES = ['https://www.googleapis.com/auth/calendar.readonly']
@@ -195,7 +194,7 @@ def google_auth():
         raise ValueError("Google token not found in environment variables. +" , GOOGLE_TOKEN)
 
     # Token in ein Dictionary umwandeln
-    token_info = json.loads(GOOGLE_TOKEN)
+    token_info = GOOGLE_TOKEN
 
     # Anmeldedaten aus dem Dictionary laden
     creds = Credentials.from_service_account_info(token_info,scopes=SCOPES)
@@ -272,14 +271,14 @@ def main():
 
 
     # Startzeitpunkt auf 7 Tage zurücksetzen (oder nach Wunsch anpassen)
-    time_min = (now - timedelta(days=21)).isoformat() + 'Z'
-    time_max = (now + timedelta(hours=3)).isoformat() + 'Z'
+    time_min = (now - timedelta(days=2)).isoformat() + 'Z'
+    time_max = (now + timedelta(hours=2)).isoformat() + 'Z'
     print(time_max)
     
     # Abrufen der letzten 10 Ereignisse aus der Vergangenheit
     events_result = service.events().list(calendarId=GOOGLE_KALENDER_ID, timeMin=time_min,
-                                          timeMax=time_max, maxResults=10, 
-                                          singleEvents=True, orderBy='startTime').execute()
+                                          timeMax=time_max, maxResults=15, 
+                                          singleEvents=True, orderBy='updated').execute()
     events = events_result.get('items', [])
 
     if not events:
